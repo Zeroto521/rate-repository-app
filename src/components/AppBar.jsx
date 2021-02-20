@@ -1,9 +1,12 @@
+import { useApolloClient, useQuery } from '@apollo/react-hooks';
 import Constants from 'expo-constants';
-import React from 'react';
-import { StyleSheet, TouchableWithoutFeedback, View, ScrollView } from 'react-native';
+import React, { useContext } from 'react';
+import { ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import { Appbar } from 'react-native-paper';
 import { Link } from 'react-router-native';
 
+import AuthStorageContext from '../contexts/AuthStorageContext';
+import { AUTHORIZED_USER } from '../graphql/queries';
 import theme from '../theme';
 import Text from './Text';
 
@@ -45,11 +48,31 @@ const AppBarTab = ({ children, ...props }) => {
 };
 
 const AppBar = () => {
+  const { data } = useQuery(AUTHORIZED_USER);
+  const authStorage = useContext(AuthStorageContext);
+
+  const apolloClient = useApolloClient();
+
+  const user = data ? data.authorizedUser : undefined;
+
+  const signOut = async () => {
+    await authStorage.removeAccessToken();
+    // with incorrect apolloClient as above, re-renders do not occur
+    await apolloClient.resetStore();
+  };
+
+
   return (
     <Appbar.Header>
       <ScrollView style={styles.scrollView} horizontal>
         <Link to="/" component={AppBarTab}>Repositories</Link>
-        <Link to="/signin" component={AppBarTab}>Sign in</Link>
+        {
+          user ? (
+            <Link to="/" component={AppBarTab} onPress={() => signOut()}>Sign out</Link>
+          ) : (
+              <Link to="/signIn" component={AppBarTab}>Sign in</Link>
+            )
+        }
       </ScrollView>
     </Appbar.Header>
   );

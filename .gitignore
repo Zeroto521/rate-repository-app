@@ -19,3 +19,7 @@ web-build/
 
 # vscode
 .vscode
+
+
+# env
+.env
