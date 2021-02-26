@@ -1,40 +1,83 @@
 import React from 'react';
-import { Avatar, Card, Button, DataTable } from 'react-native-paper';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useHistory } from 'react-router-native';
 
+import { styles as repoStyles } from '../repositoryItemStyles.js';
+import formatInThousands from '../utils/formatInThousands';
+import Text from './Text';
 
-const NumberShowing = ({ number }) => {
-  if (number > 1000)
-    return `${(number / 1000).toFixed(1)}k`;
-  else
-    return number;
+const styles = StyleSheet.create(repoStyles);
+
+const CountItem = ({ label, count }) => {
+  return (
+    <View style={styles.countItem}>
+      <Text style={styles.countItemCount} fontWeight="bold">
+        {formatInThousands(count)}
+      </Text>
+      <Text color="textSecondary">{label}</Text>
+    </View>
+  );
 };
 
+const RepositoryItem = ({ repository }) => {
+  const {
+    fullName,
+    description,
+    language,
+    forksCount,
+    stargazersCount,
+    ratingAverage,
+    reviewCount,
+    ownerAvatarUrl,
+  } = repository;
 
-const RepositoryItem = ({ item }) => {
-
-  const LeftContent = () => <Avatar.Image size={50} source={item.ownerAvatarUrl} />;
+  const history = useHistory();
+  const onPress = () => {
+    history.push(`/repo/${repository.id}`);
+  };
 
   return (
-    <Card>
-      <Card.Title title={item.fullName} subtitle={item.description} subtitleNumberOfLines={2} left={LeftContent} />
-      <Card.Content>
-        <Button mode="contained" >{item.language}</Button>
-        <DataTable>
-          <DataTable.Row>
-            <DataTable.Cell><NumberShowing number={item.stargazersCount} /></DataTable.Cell>
-            <DataTable.Cell><NumberShowing number={item.forksCount} /></DataTable.Cell>
-            <DataTable.Cell><NumberShowing number={item.reviewCount} /></DataTable.Cell>
-            <DataTable.Cell><NumberShowing number={item.ratingAverage} /></DataTable.Cell>
-          </DataTable.Row>
-          <DataTable.Header>
-            <DataTable.Title>Stars</DataTable.Title>
-            <DataTable.Title>Forks</DataTable.Title>
-            <DataTable.Title>Reviews</DataTable.Title>
-            <DataTable.Title>Rating</DataTable.Title>
-          </DataTable.Header>
-        </DataTable>
-      </Card.Content>
-    </Card>
+    <TouchableOpacity onPress={onPress} testID="touch" style={styles.container}>
+      <View style={styles.topContainer}>
+        <View style={styles.avatarContainer}>
+          <Image source={{ uri: ownerAvatarUrl }} style={styles.avatar} />
+        </View>
+
+        <View style={styles.contentContainer}>
+          <Text
+            style={styles.nameText}
+            fontWeight="bold"
+            fontSize="subheading"
+            numberOfLines={1}
+          >
+            {fullName}
+          </Text>
+
+          <Text
+            testID="description"
+            style={styles.descriptionText}
+            color="textSecondary"
+          >
+            {description}
+          </Text>
+
+          {language ? (
+            <View style={styles.languageContainer}>
+              <Text testID="language" style={styles.languageText}>
+                {language}
+              </Text>
+            </View>
+          ) : null}
+        </View>
+      </View>
+
+      <View style={styles.bottomContainer}>
+        <CountItem count={stargazersCount} label="Stars" />
+        <CountItem count={forksCount} label="Forks" />
+        <CountItem count={reviewCount} label="Reviews" />
+        <CountItem count={ratingAverage} label="Rating" />
+      </View>
+    </TouchableOpacity>
   );
 };
 

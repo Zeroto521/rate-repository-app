@@ -45,7 +45,7 @@ export const SignInForm = ({ onSubmit }) => {
       >
         <View
           style={{
-            backgroundColor: '#6e00ee',
+            backgroundColor: 'blue',
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: 5,

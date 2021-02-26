@@ -2,7 +2,6 @@ import { gql } from 'apollo-boost';
 
 import { USER_BASE_FIELDS } from './fragments';
 
-
 export const SIGN_IN = gql`
   mutation Authorize($credentials: AuthorizeInput) {
     authorize(credentials: $credentials) {
